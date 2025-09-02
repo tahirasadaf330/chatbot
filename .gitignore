@@ -7,3 +7,5 @@ venv/
 myenv/
 __pycache__/
 *.py[cod]
+
+.env
