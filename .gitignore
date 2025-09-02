@@ -1,0 +1,9 @@
+﻿.env
+faiss_index/
+pdfs/
+.vscode/
+.venv*/
+venv/
+myenv/
+__pycache__/
+*.py[cod]
