@@ -1,8 +1,15 @@
-streamlit
-google-generativeai
-python-dotenv
-langchain
-PyPDF2
-chromadb
-faiss-cpu
-langchain_google_genai
+# server + utils
+fastapi>=0.111,<0.112
+uvicorn>=0.30,<0.31       # plain uvicorn; avoids extras that can conflict on Windows
+python-dotenv>=1.0
+PyPDF2>=3.0
+
+# langchain stack
+langchain>=0.2,<0.3
+langchain-community>=0.2,<0.3
+langchain-google-genai>=1.0.5,<2
+google-generativeai>=0.7,<0.8
+
+# native/wheels
+numpy>=1.26,<2            ; python_version<'3.12'
+faiss-cpu==1.12.0         # known-good Windows wheel
