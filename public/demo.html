@@ -4,14 +4,15 @@
   <meta charset="utf-8" />
   <title>AI Widget Demo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>body{font-family:system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; padding:40px;}</style>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; padding: 40px; }
+  </style>
 </head>
 <body>
   <h1>My Website</h1>
   <p>Click the robot bubble to ask questions about our PDFs.</p>
 
   <!-- Point data-api to your deployed FastAPI /ask endpoint -->
-  <script src="./ai-widget.js" data-api="http://localhost:8000/ask" defer></script>
+  <script src="/static/ai-widget.js" data-api="http://127.0.0.1:8000/ask" defer></script>
 </body>
 </html>
-

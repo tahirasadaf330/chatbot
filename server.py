@@ -1,9 +1,10 @@
-# server.py
-import os
+﻿import os
 from typing import List, Optional
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from dotenv import load_dotenv
 
@@ -27,7 +28,10 @@ INDEX_DIR   = os.getenv("INDEX_DIR", "faiss_index")
 CHAT_MODEL  = os.getenv("CHAT_MODEL", "gemini-1.5-flash")
 EMBED_MODEL = os.getenv("EMBED_MODEL", "models/text-embedding-004")
 
-ALLOW_ORIGINS = os.getenv("ALLOW_ORIGINS", "http://localhost:5500,http://127.0.0.1:5500,https://yourdomain.com")
+ALLOW_ORIGINS = os.getenv(
+    "ALLOW_ORIGINS",
+    "http://localhost:5500,http://127.0.0.1:5500,https://yourdomain.com"
+)
 ALLOW_ORIGINS_LIST = [o.strip() for o in ALLOW_ORIGINS.split(",") if o.strip()]
 
 # ------------------ App ------------------
@@ -41,7 +45,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ------------------ RAG bits ------------------
+# Serve the public folder as /static
+app.mount("/static", StaticFiles(directory="public"), name="static")
+
+# Optional: root route serves demo.html
+@app.get("/")
+def root():
+    return FileResponse("public/demo.html")
+
+# ------------------ RAG functions ------------------
 def get_qa_chain():
     prompt_template = """
 Answer the question as completely as possible using ONLY the provided context.
@@ -79,6 +91,7 @@ def shrink_docs(docs, max_chars=12000):
             break
     return kept
 
+# ------------------ Pydantic models ------------------
 class AskIn(BaseModel):
     question: str
     k: Optional[int] = 3
@@ -87,7 +100,7 @@ class AskIn(BaseModel):
 class AskOut(BaseModel):
     answer: str
 
-# Globals loaded at startup
+# ------------------ Globals ------------------
 _vs: Optional[FAISS] = None
 _chain = None
 
@@ -119,7 +132,6 @@ def ask(req: AskIn, request: Request):
         )
         return AskOut(answer=out.get("output_text", "").strip())
     except google_exceptions.ResourceExhausted:
-        # 429 quota/rate limit
         return AskOut(answer="We’re experiencing high load. Please try again soon.")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
